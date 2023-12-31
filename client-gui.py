@@ -17,33 +17,39 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as cs:
      python = sys.executable
      os.execl(python, python, *sys.argv)
 
+  
     def on_button_click(menu, clicked_button):
         for button in menu:
             if button == clicked_button:
                 button.config(bg=button.cget("fg"), fg="#FFFFFF")
-                selection = 1
                 if clicked_button == button1:
-                  threading.Thread(target=arrived_flights).start()
+                  global t1
+                  t1=threading.Thread(target=arrived_flights)
+                  t1.start()
                 elif clicked_button == button2:
-                  threading.Thread(target=delayed_flights).start()
+                  global t2
+                  t2=threading.Thread(target=delayed_flights)
+                  t2.start()
                 elif clicked_button == button3:
-        # Destroy all existing buttons in the menu
+             # Destroy all existing buttons in the menu
                     for button in menu:
                      button.destroy()
-                    
-                    city_label = Label(root, text="Enter City Name:", font=("Poppins", 15, "italic", "bold"), fg="#000000")
-                    city_label.place(x=canvas_width / 2 - 60 ,y=470)
+        
+                    city_label = Label(root, text="Enter City Name:", font=("Poppins", 15, "bold"), fg="#38B6FF")
+                    city_label.place(x=canvas_width / 2 - 80 ,y=470)
                     city_frame = Frame(root)
                     global city_entry
                     city_entry = Entry(city_frame)
-                    city_entry.place(x=canvas_width / 2 - 120, y=logo_y + logo_image.height() + 20, width=300, height=50)
-                    city_frame.place(x=canvas_width / 2 - 120, y=logo_y + logo_image.height() + 20, width=300, height=50)
+                    city_entry.place(x=canvas_width / 2 - 130, y=logo_y + logo_image.height() + 20, width=300, height=50)
+                    city_frame.place(x=canvas_width / 2 - 130, y=logo_y + logo_image.height() + 20, width=300, height=50)
                     city_entry_label = Label(city_frame, text="City:")
                     city_entry_label.pack(side=LEFT, padx=10)
                     city_entry.pack(side=LEFT, padx=10)
-                    city_entry_button = Button(city_frame, text="Search", command=city_flight)
+                    global t3
+                    t3=threading.Thread(target=city_flight)
+                    city_entry_button = Button(city_frame, text="Search", command= t3.start)
                     city_entry_button.pack(side=LEFT, padx=10)
-                    back_button = create_rounded_button(root, canvas_width / 2 - 100, tagline_y + 190,
+                    back_button = create_rounded_button(root, canvas_width / 2 - 100, 600,
                                                          button_width, button_height, "Start again",
                                                          lambda: restart_program(), stroke=False)
                     
@@ -51,26 +57,27 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as cs:
                 elif clicked_button == button4:
                     for button in menu:
                       button.destroy()  
-                    flight_label = Label(root, text="Enter Flight Number:", font=("Poppins", 15, "italic", "bold"), fg="#000000")
-                    flight_label.place(x=canvas_width / 2 - 60 ,y=470)
+                    flight_label = Label(root, text="Enter Flight Number:", font=("Poppins", 15, "bold"), fg="#38B6FF")
+                    flight_label.place(x=canvas_width / 2 - 80 ,y=470)
                     flight_frame = Frame(root)
                     global flight_entry
                     flight_entry = Entry(flight_frame)
-                    flight_entry.place(x=canvas_width / 2 - 120, y=logo_y + logo_image.height() + 20, width=300, height=50)
-                    flight_frame.place(x=canvas_width / 2 - 120, y=logo_y + logo_image.height() + 20, width=300, height=50)
+                    flight_entry.place(x=canvas_width / 2 - 130, y=logo_y + logo_image.height() + 20, width=300, height=50)
+                    flight_frame.place(x=canvas_width / 2 - 130, y=logo_y + logo_image.height() + 20, width=300, height=50)
                     flight_entry_label = Label(flight_frame, text="Flight:")
                     flight_entry_label.pack(side=LEFT, padx=10)
                     flight_entry.pack(side=LEFT, padx=10)
                     flight_entry_button = Button(flight_frame, text="Search", command=specific_flight)
                     flight_entry_button.pack(side=LEFT, padx=10)
-                    back_button = create_rounded_button(root, canvas_width / 2 - 100, tagline_y + 190,
+                    back_button = create_rounded_button(root, canvas_width / 2 - 100, 600,
                                                             button_width, button_height, "Start again",
                                                             lambda: restart_program(), stroke=False)
-
    
             else:
                 button.config(bg="#FFFFFF", fg="#38B6FF")
-        show_continue(selection)
+
+    
+            menu =[button for button in menu ]
 
 
     def display_arrived_flights(cs):
@@ -161,17 +168,17 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as cs:
             data = cs.recv(19999)
             data = data.decode()
             data = json.loads(data)
-            headers = ['IATA', 'Departure', 'Arrival', 'Terminal', 'Departure Gate', 'Arrival Gate', 'Status']
+            headers = ['IATA', 'Departure', 'Arrival', 'Terminal', 'D-Gate', 'A-Gate', 'Status']
             return data, headers
         
         except Exception as e:
             print(f"Error in displaying flight: {e}")
-            return display_city_flight
+            return city_flight()
 
     def city_flight():
             choice = {"option": 3, "value_search": city_entry.get()}
-            choice= json.dumps(choice)
-            cs.sendall(choice.encode())
+            choice3= json.dumps(choice)
+            cs.sendall(choice3.encode())
             top = Toplevel(root)
             top.title(f"{city_entry.get()} Flights")
 
@@ -198,7 +205,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as cs:
             data = cs.recv(19999)
             data = data.decode()
             data = json.loads(data)
-            headers = ['IATA', 'Departure', 'Arrival', 'Terminal', 'Departure Gate', 'Arrival Gate', 'Status']
+            headers = ['IATA', 'Departure', 'Arrival', 'Terminal', 'D-Gate', 'A-Gate', 'Status']
             return data, headers
         
          except Exception as e:
@@ -234,37 +241,40 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as cs:
     canvas.pack()
 
     # Load logo image (replace with the path to your logo)
-    logo_image = PhotoImage(file="logo.png")
-    logo_x = (canvas_width - logo_image.width()) / 2
-    logo_y = 20
-    canvas.create_image(logo_x, logo_y, anchor="nw", image=logo_image)
-
+    banner = PhotoImage(file="banner1.png")
+    logo_x = (canvas_width -500)
+    logo_y = 320
+    
     # Tagline text
     tagline_text = "Your gateway to global flight information."
     tagline_x = canvas_width / 2
     tagline_y = logo_y + 400
     canvas.create_text(tagline_x, tagline_y, text=tagline_text, font=("Poppins", 18, "italic", "bold"), fill="#38B6FF")
-
+    banner_image= canvas.create_image(logo_x, logo_y, anchor="center", image=banner)
+    
     # Name Entry Frame
     name_entry_frame = Frame(root)
-    name_entry_frame.place(x=canvas_width / 2 - 120, y=logo_y + logo_image.height() + 20, width=300, height=50)
+    name_entry_frame.place(x=canvas_width/2 +70 , y=380, width=300, height=50)
 
-    # Welcome Label
-    welcome_label = Label(root, text="Enter your name to get started:", font=("Poppins", 15, "italic", "bold"), fg="#000000")
-    welcome_label.place(x=canvas_width / 2 - 140, y=470)
+    logo_image = PhotoImage(file="logo.png")
+    logo_x = (canvas_width - logo_image.width()) / 2
+    logo_y = 20
 
     def show_options():
         global name
         name= name_entry.get()
         cs.send(name.encode('ascii'))
-        welcome_user = Label(root, text=f"Welcome {name_entry.get()}", font=("Poppins", 15, "italic", "bold"), fg="#000000")
-        welcome_user.place(x=20, y=20)  
+        welcome_user = Label(root, text=f"Welcome {name_entry.get()}!", font=("Poppins", 15, "italic", "bold"), fg="#000000")
+        welcome_user.place(x=center_x - 90, y=400)  
         name_entry_frame.pack_forget()
         name_entry_label.destroy()
         name_entry.destroy()
         name_entry_button.destroy()
         name_entry_frame.destroy()
-        welcome_label.destroy()
+        canvas.delete(banner_image) 
+        #name_entry_frame = Frame(root)
+        global logo_image_on_canvas
+        logo_image_on_canvas = canvas.create_image(logo_x, logo_y, anchor="nw", image=logo_image)
         buttons()
 
     button_width = 200
@@ -280,7 +290,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as cs:
         quit_button = create_rounded_button(canvas, quit_button_x, quit_button_y, button_width, button_height, "Quit",
                                             lambda: root.destroy(), stroke=False)
         # First row of buttons
-        button_y_row1 = tagline_y + 60  # Adjusted position
+        button_y_row1 = 470 # Adjusted position
         global button1 
         button1= create_rounded_button(canvas, center_x -200 , button_y_row1, button_width, button_height,
                                         "View All Arrived Flights", lambda: on_button_click(menu,button1))
@@ -300,11 +310,6 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as cs:
         global menu
         menu= [button1,button2,button3,button4]
         
-
-    def show_continue(state):
-        if state==1:
-         continue_button = create_rounded_button(canvas, center_x - 100, tagline_y + 190, button_width, button_height, "Continue",
-                                            lambda: print("Continue button clicked"), stroke=False)
     # Name Entry
     name_entry_label = Label(name_entry_frame, text="Name:")
     name_entry_label.pack(side=LEFT, padx=10)
@@ -312,4 +317,6 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as cs:
     name_entry.pack(side=LEFT, padx=10)
     name_entry_button = Button(name_entry_frame, text="Submit", command=show_options)
     name_entry_button.pack(side=LEFT, padx=10)
+    
+
     root.mainloop()
