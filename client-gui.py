@@ -4,6 +4,14 @@ import socket
 import json, threading , os, sys
 from tabulate import tabulate
 
+
+# IMPORTANT: To Dr.Mohammed: This version of the client code is implementing a GUI that is using certain design assets and components that are not
+# available on your local machine. As a result, you might receive an error when compiling this code. If you want to run the non-GUI client 
+# code please download and run the  "c.py"  file attached in our submission. Please refer to the end of our presentation video 
+# to see a demo/presentation of the client GUI !
+
+
+
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as cs:
     cs.connect(('127.0.0.1', 2003))
     def create_rounded_button(frame, x, y, width, height, text, command, stroke=True):
