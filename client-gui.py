@@ -6,7 +6,9 @@ from tabulate import tabulate
 
 
 # IMPORTANT: To Dr.Mohammed: This version of the client code is implementing a GUI that is using certain design assets and components that are not
-# available on your local machine. As a result, you might receive an error when compiling this code. If you want to run the non-GUI client 
+# available on your local machine. As a result, you might receive an error when compiling this code. In order for the client gui code to compile without any errors, the
+# design assets attached in the zip folder must be first downloaded on your local machine. When running the code, you must make
+# sure that you are in the directory in which the design assets file is saved. If you want to run the non-GUI client 
 # code please download and run the  "c.py"  file attached in our submission. Please refer to the end of our presentation video 
 # to see a demo/presentation of the client GUI !
 
